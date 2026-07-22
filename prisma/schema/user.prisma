@@ -12,10 +12,17 @@ model User {
   profileId Profile?
 
   // Relations
-//   properties       Property[]
-//   rentalRequests   RentalRequest[]
-//   reviews          Review[]
+  properties       Property[]
+  rentalRequests   RentalRequest[]
+  reviews          Review[]
 
 @@map("users")
 }
+
+
+
+
+
+
+
 
