@@ -29,7 +29,7 @@ export const auth = (...requiredRoles: Role[]) => {
           req.headers.authorization?.split(" ")[1] : 
           req.headers.authorization;
         // console.log("the token", token)
-        // || req.headers.authorization?.startsWith("Bearer ") ? req.headers.authorization?.split(" ")[1] : req.headers.authorization;
+      
         if (!token) {
             throw new Error("Authentication token is required.");
         }
@@ -38,15 +38,14 @@ export const auth = (...requiredRoles: Role[]) => {
             throw new Error(verifiedToken.error);
         }
         const { id, name, email, role } = verifiedToken.data as JwtPayload;
+        
         if (requiredRoles.length && !requiredRoles.includes(role)) {
             throw new Error("Access denied: You do not have the required role.");
         }
             const user = await prisma.user.findFirstOrThrow({
                 where : {
                     id,
-                    email,
-                    name,
-                    role
+                    email
                 },
             })
            if (!user) {

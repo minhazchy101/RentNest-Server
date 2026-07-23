@@ -25,5 +25,10 @@ model RentalRequest {
 
   @@unique([tenantId, propertyId])
 
+    @@index([status])
+  @@index([tenantId])
+  @@index([propertyId])
+
+
   @@map("rentalRequests")
 }

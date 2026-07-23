@@ -19,5 +19,7 @@ model Payment {
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 
+   @@index([status])
+
   @@map("payments")
 }
