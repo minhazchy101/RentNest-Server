@@ -43,6 +43,116 @@ const createCategoriesIntoDB = async (payload: ICategory) => {
   return result;
 };
 
+const getCategoriesIntoDB = async () => {
+  const result = await prisma.category.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result;
+};
+
+const updateCategoryIntoDB = async (
+  id: string,
+  payload: any
+) => {
+
+  const existingCategory = await prisma.category.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  if (!existingCategory) {
+    throw new Error("Category not found.");
+  }
+
+
+  if (payload.name !== undefined) {
+
+    const updatedName = payload.name.trim();
+
+    if (!updatedName) {
+      throw new Error(
+        "Category name cannot be empty."
+      );
+    }
+
+
+    const duplicateCategory = await prisma.category.findFirst({
+      where: {
+        name: {
+          equals: updatedName,
+          mode: "insensitive",
+        },
+        NOT: {
+          id,
+        },
+      },
+    });
+
+
+    if (duplicateCategory) {
+      throw new Error(
+        "Category already exists."
+      );
+    }
+
+
+    payload.name = updatedName;
+  }
+
+
+  if (payload.description !== undefined) {
+    payload.description =
+      payload.description.trim() || null;
+  }
+
+
+  const result = await prisma.category.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+
+
+  return result;
+};
+
+
+const deleteCategoryFromDB = async (id: string) => {
+
+  const existingCategory = await prisma.category.findUnique({
+    where: {
+      id,
+    },
+  });
+
+
+  if (!existingCategory) {
+    throw new Error(
+     "Category not found."
+    );
+  }
+
+
+  const result = await prisma.category.delete({
+    where: {
+      id,
+    },
+  });
+
+
+  return result;
+};
+
+
+
 export const categoryServices = {
-    createCategoriesIntoDB
+    createCategoriesIntoDB,
+    getCategoriesIntoDB,
+    updateCategoryIntoDB,
+    deleteCategoryFromDB
 }
