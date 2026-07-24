@@ -6,6 +6,7 @@ import httpStatus from "http-status-codes"
 import { sendRes } from "../../utilities/sendResponse";
 const {createPropertyIntoDB, 
   getPropertiesIntoDB,
+  getMyPropertiesIntoDB,
    getPropertyDetailsIntoDB,
   updatePropertyIntoDB,
   deletePropertyIntoDB
@@ -47,6 +48,19 @@ const getProperties = catchAsync(
   }
 );
 
+const getMyProperties = catchAsync(
+  async (req: Request, res: Response) => { 
+    console.log('getMyProperties')
+    const result = await getMyPropertiesIntoDB(req.user?.id as string)
+     sendRes(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "MY Property retrieved successfully.",
+      data: result,
+    });
+  }
+)
+
 const getPropertyDetails = catchAsync(
   async (req: Request, res: Response) => {
 
@@ -62,6 +76,7 @@ const getPropertyDetails = catchAsync(
     });
   }
 );
+
 
 const updateProperty = catchAsync(
   async (req: Request, res: Response) => {
@@ -121,5 +136,6 @@ export const propertyController ={
     getProperties,
     getPropertyDetails,
     updateProperty,
-deleteProperty
+deleteProperty,
+getMyProperties
 }

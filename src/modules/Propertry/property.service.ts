@@ -233,7 +233,6 @@ const getPropertiesIntoDB = async (
 const getPropertyDetailsIntoDB = async (
   id: string
 ) => {
-
   const property = await prisma.property.findUniqueOrThrow({
     where: {
       id,
@@ -260,6 +259,53 @@ const getPropertyDetailsIntoDB = async (
 
   return property;
 };
+
+const getMyPropertiesIntoDB = async(landlordId: string)=>{
+console.log("landlordId ", landlordId)
+const properties = await prisma.property.findMany({
+  where: {
+    landlordId,
+  },
+
+  include: {
+    category: {
+      select: {
+        name: true,
+        description: true,
+      },
+    },
+
+    reviews: {
+      select: {
+        id: true,
+        rating: true,
+        comment: true,
+        createdAt: true,
+        tenant: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    },
+
+    _count: {
+      select: {
+        rentalRequests: true,
+        reviews: true,
+      },
+    },
+  
+  },
+
+  orderBy: {
+    createdAt: "desc",
+  },
+});
+
+  return properties;
+}
 
 const updatePropertyIntoDB = async (
   id: string,
@@ -400,6 +446,7 @@ const deletePropertyIntoDB = async(
 export const propertyService = {
   createPropertyIntoDB,
   getPropertiesIntoDB,
+  getMyPropertiesIntoDB,
   getPropertyDetailsIntoDB,
   updatePropertyIntoDB,
   deletePropertyIntoDB

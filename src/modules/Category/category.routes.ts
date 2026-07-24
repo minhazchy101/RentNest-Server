@@ -7,8 +7,9 @@ const router = Router();
 
 const {createCategories, getCategories, updateCategory, deleteCategory} = categoryController;
 
-router.post("/", auth(Role.ADMIN), createCategories)
 router.get("/", getCategories)
+// Admin management
+router.post("/", auth(Role.ADMIN), createCategories)
 router.put("/:id", auth(Role.ADMIN), updateCategory);
 router.delete("/:id", auth(Role.ADMIN), deleteCategory);
 

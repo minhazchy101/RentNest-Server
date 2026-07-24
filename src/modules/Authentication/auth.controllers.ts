@@ -7,7 +7,9 @@ import { sendRes } from "../../utilities/sendResponse";
 const {userRegisterIntoDB, 
       userLoginIntoDB,
      currentUserIntoDB,
-     manageProfileIntoDB} = authServices;
+     manageProfileIntoDB,
+    getUsersIntoDB
+     } = authServices;
 
 const userRegister = catchAsync(
   async(req: Request, res: Response, next : NextFunction)=>{
@@ -86,11 +88,27 @@ const manageProfile = catchAsync (
   message: "Profile updated successfully",
   data: updatedUser,
 });
-      })
+      });
+
+const getUsers = catchAsync(
+     async (req: Request, res: Response) => {
+
+    const result = await getUsersIntoDB();
+
+    sendRes(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Users retrieved successfully.",
+      data: result,
+    });
+
+  }
+)
 
 export const authControllers = {
     userRegister,
     userLogin,
     currentUser,
-    manageProfile
+    manageProfile,
+    getUsers
 }

@@ -9,20 +9,21 @@ const {createProperty,
     getProperties,
     getPropertyDetails,
     updateProperty,
-    deleteProperty
+    deleteProperty,
+    getMyProperties
 } = propertyController;
 
 // Landlord Management
 router.post("/landlord", auth(Role.LANDLORD), createProperty);
+router.get("/landlord", auth(Role.LANDLORD), getMyProperties)
 router.put("/:id/landlord", auth(Role.LANDLORD),    updateProperty);
 router.delete("/:id/landlord", auth(Role.LANDLORD), deleteProperty)
-
-// router.get("/my-properties",)
-
-// router.patch("/:id/status",)
 
 // public 
 router.get("/", getProperties)
 router.get("/:id", getPropertyDetails)
+
+// router.patch("/:id/status",)
+
 
 export const propertyRoutes = router;

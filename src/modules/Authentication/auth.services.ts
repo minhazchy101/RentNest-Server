@@ -113,9 +113,20 @@ const manageProfileIntoDB = async (
   return user;
 };
 
+const getUsersIntoDB = async()=>{
+      const result = await prisma.user.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result;
+}
+
 export const authServices = {
     userRegisterIntoDB,
     userLoginIntoDB,
     currentUserIntoDB,
-    manageProfileIntoDB
+    manageProfileIntoDB,
+    getUsersIntoDB
 }
