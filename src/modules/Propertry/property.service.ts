@@ -1,5 +1,8 @@
-import { IProperty } from "./property.interface";
+import { IProperty, IPropertyQuery } from "./property.interface";
 import { prisma } from "../../lib/prisma";
+import { PropertyStatus } from "../../../generated/prisma/enums";
+import { Prisma } from "../../../generated/prisma/client";
+
 
 const createPropertyIntoDB = async (
   payload: IProperty,
@@ -64,7 +67,6 @@ const createPropertyIntoDB = async (
     landlordId,
     categoryId: payload.categoryId,
   };
-  console.log("property Data: ", propertyData)
 
   // Create property
   const result = await prisma.property.create({
@@ -74,6 +76,161 @@ const createPropertyIntoDB = async (
   return result;
 };
 
+
+const getPropertiesIntoDB = async (
+  query: IPropertyQuery
+) => {
+  const {
+    searchTerm,
+    city,
+    minRent,
+    maxRent,
+    categoryId,
+    amenities,
+    status,
+
+    page = "1",
+    limit = "10",
+
+    sortBy = "createdAt",
+    sortOrder = "desc",
+  } = query;
+
+  // Pagination
+  const currentPage = Math.max(Number(page) || 1, 1);
+  const pageSize = Math.max(Number(limit) || 10, 1);
+  const skip = (currentPage - 1) * pageSize;
+
+  // Whitelist Sorting
+  const allowedSortFields = ["createdAt", "rent", "title"];
+
+  const finalSortBy = allowedSortFields.includes(sortBy)
+    ? sortBy
+    : "createdAt";
+
+  const finalSortOrder =
+    sortOrder === "asc" ? "asc" : "desc";
+
+  // Dynamic Where
+  const whereConditions: Prisma.PropertyWhereInput = {};
+ 
+  
+  // Search
+  if (searchTerm) {
+    whereConditions.OR = [
+      {
+        title: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      },
+      {
+        description: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      },
+      {
+        city: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      },
+      {
+        address: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      },
+    ];
+  }
+
+  // Location
+  if (city) {
+    whereConditions.city = {
+      contains: city,
+      mode: "insensitive",
+    };
+  }
+
+  // Category
+  if (categoryId) {
+    whereConditions.categoryId = categoryId;
+  }
+
+  // Property Status
+  if (status) {
+    whereConditions.status = status as PropertyStatus;
+  }
+
+  // Price Range
+  if (minRent || maxRent) {
+    whereConditions.rent = {};
+
+    if (minRent) {
+      whereConditions.rent.gte = Number(minRent);
+    }
+
+    if (maxRent) {
+      whereConditions.rent.lte = Number(maxRent);
+    }
+  }
+
+  // Amenities
+  if (amenities) {
+    whereConditions.amenities = {
+      hasSome: amenities.split(","),
+    };
+  }
+
+  // Database Query
+  const [properties, total] = await Promise.all([
+    prisma.property.findMany({
+      where: whereConditions,
+
+      skip,
+      take: pageSize,
+
+      orderBy: {
+        [finalSortBy]: finalSortOrder,
+      },
+
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+
+        landlord: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    }),
+
+    prisma.property.count({
+      where: whereConditions,
+    }),
+  ]);
+
+  return {
+    meta: {
+      page: currentPage,
+      limit: pageSize,
+      total,
+      totalPage: Math.ceil(total / pageSize),
+    },
+
+    data: properties,
+  };
+};
+
+
 export const propertyService = {
   createPropertyIntoDB,
+  getPropertiesIntoDB
 };
