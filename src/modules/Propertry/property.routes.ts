@@ -6,15 +6,23 @@ import { Role } from "../../../generated/prisma/enums";
 const router = Router();
 
 const {createProperty,
-    getProperties
+    getProperties,
+    getPropertyDetails,
+    updateProperty,
+    deleteProperty
 } = propertyController;
 
-router.post("/", auth(Role.LANDLORD), createProperty);
-router.get("/", getProperties)
-// router.get("/:id",)
+// Landlord Management
+router.post("/landlord", auth(Role.LANDLORD), createProperty);
+router.put("/:id/landlord", auth(Role.LANDLORD),    updateProperty);
+router.delete("/:id/landlord", auth(Role.LANDLORD), deleteProperty)
+
 // router.get("/my-properties",)
-// router.put("/:id",)
-// router.delete("/:id",)
+
 // router.patch("/:id/status",)
+
+// public 
+router.get("/", getProperties)
+router.get("/:id", getPropertyDetails)
 
 export const propertyRoutes = router;

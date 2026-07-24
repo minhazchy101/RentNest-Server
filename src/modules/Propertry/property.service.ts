@@ -230,7 +230,177 @@ const getPropertiesIntoDB = async (
 };
 
 
+const getPropertyDetailsIntoDB = async (
+  id: string
+) => {
+
+  const property = await prisma.property.findUniqueOrThrow({
+    where: {
+      id,
+    },
+
+    include: {
+      category:{
+        select : {
+          name : true,
+          description : true
+        }
+      },
+
+      landlord: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+
+      reviews: true,
+    },
+  });
+
+  return property;
+};
+
+const updatePropertyIntoDB = async (
+  id: string,
+  landlordId: string,
+  payload: Partial<IProperty>
+) => {
+
+  const property = await prisma.property.findUniqueOrThrow({
+    where:{
+      id
+    }
+  });
+
+
+  if(property.landlordId !== landlordId){
+
+    throw new Error(
+      "You are not allowed to update this property."
+    );
+
+  }
+
+ const propertyData = {
+
+  ...(payload.title && {
+    title: payload.title.trim()
+  }),
+
+  ...(payload.description && {
+    description: payload.description.trim()
+  }),
+
+  ...(payload.address && {
+    address: payload.address.trim()
+  }),
+
+  ...(payload.city && {
+    city: payload.city.trim()
+  }),
+
+  ...(payload.area && {
+    area: payload.area.trim()
+  }),
+
+  ...(payload.zipCode && {
+    zipCode: payload.zipCode.trim()
+  }),
+
+
+  ...(payload.rent && {
+    rent: payload.rent
+  }),
+
+  ...(payload.bedrooms && {
+    bedrooms: payload.bedrooms
+  }),
+
+  ...(payload.bathrooms && {
+    bathrooms: payload.bathrooms
+  }),
+
+  ...(payload.size && {
+    size: payload.size
+  }),
+
+  ...(payload.amenities && {
+    amenities: payload.amenities
+  }),
+
+  ...(payload.images && {
+    images: payload.images
+  }),
+
+
+  ...(payload.categoryId && {
+    categoryId: payload.categoryId
+  })
+
+};
+
+
+  const updatedProperty =
+    await prisma.property.update({
+
+      where:{
+        id
+      },
+
+      data: propertyData
+
+    });
+
+
+  return updatedProperty;
+
+};
+
+
+const deletePropertyIntoDB = async(
+  id:string,
+  landlordId:string
+)=>{
+
+
+ const property =
+   await prisma.property.findUniqueOrThrow({
+      where:{
+        id
+      }
+   });
+
+
+
+ if(property.landlordId !== landlordId){
+
+    throw new Error(
+      "You are not allowed to delete this property."
+    );
+
+ }
+
+
+   await prisma.property.delete({
+      where:{
+        id
+      }
+   });
+
+
+ return {
+
+ };
+
+}
+
+
+
 export const propertyService = {
   createPropertyIntoDB,
-  getPropertiesIntoDB
+  getPropertiesIntoDB,
+  getPropertyDetailsIntoDB,
+  updatePropertyIntoDB,
+  deletePropertyIntoDB
 };

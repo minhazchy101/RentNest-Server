@@ -32,7 +32,7 @@ model Property {
   rentalRequests  RentalRequest[]
   reviews         Review[]
 
-   @@index([city])
+  @@index([city])
   @@index([rent])
   @@index([status])
   @@index([categoryId])
