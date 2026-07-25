@@ -65,9 +65,24 @@ const rentalDetails = catchAsync(
 );
 
 const updateRentalStatus = catchAsync(
-    async (req: Request, res: Response) => { 
+   async (req: Request, res: Response) => {
 
-    }
+    const id = req.params.id;
+    const tenantId = req.user!.id;
+    const payload = req.body;
+    const result = await updateRentalStatusIntoDB(
+      id as string,
+      tenantId,
+      payload
+    );
+
+    sendRes(res,{
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Rental Status Updated successfully.",
+      data: result,
+    });
+  }
 );
 const getRentalRequests = catchAsync(
   async (req: Request, res: Response) => {
