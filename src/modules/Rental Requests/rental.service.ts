@@ -59,12 +59,79 @@ if (isNaN(moveInDate.getTime())) {
 
   return rentalRequest;
 };
-const myRentalHistoryIntoDB = async()=>{
 
-}
-const rentalDetailsIntoDB = async()=>{
+const myRentalHistoryIntoDB = async(tenantId: string)=>{
+  const rentalRequestsHistory = await prisma.rentalRequest.findMany({
+  where:{
+    tenantId,
+  },
 
+  orderBy:{
+    createdAt:"desc",
+  },
+
+  include:{
+    property:{
+      select:{
+        id:true,
+        title:true,
+        city:true,
+        address:true,
+        rent:true,
+        status:true,
+
+        category:{
+          select:{
+            id:true,
+            name:true,
+          }
+        }
+      }
+    },
+
+  }
+});
+return rentalRequestsHistory;
 }
+
+const rentalDetailsIntoDB = async (
+  id: string,
+  tenantId: string
+) => {
+
+  const rentalRequest =
+    await prisma.rentalRequest.findFirstOrThrow({
+
+      where:{
+        id,
+        tenantId,
+      },
+
+      include:{
+        property:{
+          select:{
+            id:true,
+            title:true,
+            city:true,
+            address:true,
+            rent:true,
+            status:true,
+
+            category:{
+              select:{
+                id:true,
+                name:true,
+              },
+            },
+          },
+        },
+      },
+
+    });
+
+
+  return rentalRequest;
+};
 const updateRentalStatusIntoDB = async()=>{
 
 }

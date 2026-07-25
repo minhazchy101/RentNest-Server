@@ -10,6 +10,7 @@ const {submitRentalIntoDB,
     rentalDetailsIntoDB,
     updateRentalStatusIntoDB,
     getRentalRequestsIntoDB} = rentalService;
+
 const submitRental = catchAsync(
     async (req: Request, res: Response) => { 
         const payload = req.body;
@@ -26,15 +27,41 @@ const submitRental = catchAsync(
     })
     }
 );
+
 const myRentalHistory = catchAsync(
-    async (req: Request, res: Response) => { 
+  async (req: Request, res: Response) => {
 
-    }
+    const tenantId = req.user!.id;
+
+    const result = await myRentalHistoryIntoDB(tenantId);
+
+    sendRes(res,{
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Rental history retrieved successfully.",
+      data: result,
+    });
+  }
 );
-const rentalDetails = catchAsync(
-    async (req: Request, res: Response) => { 
 
-    }
+const rentalDetails = catchAsync(
+  async (req: Request, res: Response) => {
+
+    const id = req.params.id;
+    const tenantId = req.user!.id;
+
+    const result = await rentalDetailsIntoDB(
+      id as string,
+      tenantId
+    );
+
+    sendRes(res,{
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Rental details retrieved successfully.",
+      data: result,
+    });
+  }
 );
 const updateRentalStatus = catchAsync(
     async (req: Request, res: Response) => { 
