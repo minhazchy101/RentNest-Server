@@ -4,7 +4,9 @@ import cors from "cors";
 import config from "./config";
 import { authRoutes } from "./modules/Authentication/auth.routes";
 import { categoryRoutes } from "./modules/Category/category.routes";
-import { propertyRoutes } from "./modules/Propertry/property.routes";
+import { propertyRoutes } from "./modules/Property/property.routes";
+import { rentalRoutes } from "./modules/Rental Requests/Rental.routes";
+
 
 export const app : Application = express();
 
@@ -27,4 +29,5 @@ app.get("/", async(req: Request, res: Response)=>{
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/properties", propertyRoutes);
+app.use("/api/rentals", rentalRoutes);
 
