@@ -132,12 +132,49 @@ const rentalDetailsIntoDB = async (
 
   return rentalRequest;
 };
+
 const updateRentalStatusIntoDB = async()=>{
 
 }
-const getRentalRequestsIntoDB = async()=>{
+const getRentalRequestsIntoDB = async (
+  landlordId: string
+) => {
 
-}
+  const rentalRequests =
+    await prisma.rentalRequest.findMany({
+
+      where:{
+        property:{
+          landlordId,
+        },
+      },
+
+      orderBy:{
+        createdAt:"desc",
+      },
+
+      include:{
+
+        property:{
+          select:{
+            title:true,
+            status:true,
+            category:{
+              select:{
+                id:true,
+                name:true,
+              },
+            },
+          },
+        },
+
+      },
+
+    });
+
+
+  return rentalRequests;
+};
 
 export const rentalService = {
     submitRentalIntoDB,

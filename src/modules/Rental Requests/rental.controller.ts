@@ -63,15 +63,28 @@ const rentalDetails = catchAsync(
     });
   }
 );
+
 const updateRentalStatus = catchAsync(
     async (req: Request, res: Response) => { 
 
     }
 );
 const getRentalRequests = catchAsync(
-    async (req: Request, res: Response) => { 
+  async (req: Request, res: Response) => {
 
-    }
+    const landlordId = req.user!.id;
+
+    const result = await getRentalRequestsIntoDB(
+      landlordId
+    );
+
+    sendRes(res,{
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Rental requests retrieved successfully.",
+      data: result,
+    });
+  }
 );
 
 
