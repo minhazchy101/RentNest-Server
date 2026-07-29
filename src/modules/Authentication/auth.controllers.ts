@@ -32,17 +32,15 @@ const userLogin = catchAsync(
     async(req: Request, res: Response, next : NextFunction)=>{
         
         const  payload = req.body;
-        const  {
-        accessToken,
-        refreshToken} = await userLoginIntoDB(payload)
+        const  result = await userLoginIntoDB(payload)
         // console.log(payload)
-            res.cookie("accessToken", accessToken,{
+            res.cookie("accessToken", result.accessToken,{
         httpOnly: true,
         secure: false,
         sameSite : "none",
         maxAge: 1000 * 60 * 60 * 24
     })
-    res.cookie("refreshToken", refreshToken,{
+    res.cookie("refreshToken", result.refreshToken,{
         httpOnly: true,
         secure: false,
         sameSite : "none",
@@ -53,8 +51,10 @@ const userLogin = catchAsync(
       statusCode : httpStatus.OK,
       message: "User Login successfully.",
       data :  {
-        accessToken,
-        refreshToken},
+        result
+        // accessToken,
+        // refreshToken
+      },
     })
 
 }

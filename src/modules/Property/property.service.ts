@@ -321,7 +321,6 @@ const updatePropertyIntoDB = async (
 
 
   if(property.landlordId !== landlordId){
-
     throw new Error(
       "You are not allowed to update this property."
     );
@@ -329,7 +328,6 @@ const updatePropertyIntoDB = async (
   }
 
  const propertyData = {
-
   ...(payload.title && {
     title: payload.title.trim()
   }),
