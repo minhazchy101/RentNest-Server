@@ -10,6 +10,7 @@ import { paymentRoutes } from "./modules/Payments/payments.routes";
 import { notFound } from "./middleware/notFound";
 import { globalError } from "./middleware/globalError";
 import { paymentController } from "./modules/Payments/payments.controller";
+import { reviewRoutes } from "./modules/Reviews/reviews.route";
 
 
 export const app : Application = express();
@@ -42,6 +43,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/rentals", rentalRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 
 app.use(notFound)

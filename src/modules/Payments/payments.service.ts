@@ -182,14 +182,14 @@ const handleWebhookSession = async (
   },
 });
 
-    // Rental ACTIVE
+    // Rental COMPLETED
     await tx.rentalRequest.update({
       where: {
         id: rentalRequestId,
       },
 
       data: {
-        status: RentalStatus.ACTIVE,
+        status: RentalStatus.COMPLETED,
       },
     });
 
