@@ -5,7 +5,10 @@ import { paymentsService } from "./payments.service";
 
 import httpStatus from "http-status-codes"
 
-const { createPaymentSessionIntoDB, handleWebhookSession } = paymentsService;
+const { createPaymentSessionIntoDB,
+       handleWebhookSession,
+    getPaymentHistoryIntoDB,
+    getPaymentDetailsIntoDB } = paymentsService;
 
 const createPaymentSession = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -40,7 +43,44 @@ const handleWebhook = catchAsync(
   }
 );
 
+const getPaymentHistory = catchAsync(
+  async (req: Request, res: Response) => {
+    const tenantId = req.user!.id;
+
+    const result = await getPaymentHistoryIntoDB(tenantId);
+
+    sendRes(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Payment history retrieved successfully.",
+      data: result,
+    });
+  }
+);
+
+ const getPaymentDetails = catchAsync(
+  async (req: Request, res: Response) => {
+    const tenantId = req.user!.id;
+    const paymentId = req.params.id;
+
+    const result = await getPaymentDetailsIntoDB(
+      paymentId as string,
+      tenantId
+    );
+
+    sendRes(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Payment details retrieved successfully.",
+      data: result,
+    });
+  }
+);
+
+
 export const paymentController = {
     createPaymentSession,
     handleWebhook,
+    getPaymentHistory,
+ getPaymentDetails
 }

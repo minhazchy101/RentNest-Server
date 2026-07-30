@@ -35,6 +35,7 @@ const createPaymentSessionIntoDB = async (
       payment: true,
     },
   });
+
   if (rentalRequest.status !== RentalStatus.APPROVED) {
     throw new Error(
       "This rental request is not approved for payment."
@@ -129,6 +130,7 @@ const handleWebhookSession = async (
  const handleCheckoutComplete = async (
   session: Stripe.Checkout.Session
 ) => {
+  try {
   const rentalRequestId = session.metadata?.rentalRequestId;
 
   if (!rentalRequestId) {
@@ -160,30 +162,25 @@ const handleWebhookSession = async (
   await prisma.$transaction(async (tx) => {
     // Create Payment
     await tx.payment.create({
-      data: {
-        rentalRequestId,
+  data: {
+    rentalRequestId,
 
-        amount: rentalRequest.property.rent,
+    amount: rentalRequest.property.rent,
 
-        provider: PaymentProvider.STRIPE,
+    provider: PaymentProvider.STRIPE,
 
-        status: PaymentStatus.COMPLETED,
+    status: PaymentStatus.COMPLETED,
 
-        transactionId:
-          typeof session.payment_intent === "string"
-            ? session.payment_intent
-            : null,
+    transactionId:
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : null,
 
-        stripeCustomerId:
-          typeof session.customer === "string"
-            ? session.customer
-            : "",
+    method: "card",
 
-        method: "card",
-
-        paidAt: new Date(),
-      },
-    });
+    paidAt: new Date(),
+  },
+});
 
     // Rental ACTIVE
     await tx.rentalRequest.update({
@@ -207,9 +204,126 @@ const handleWebhookSession = async (
       },
     });
   });
+  } catch (err) {
+    console.error(err);
+
+   throw err;
+  }
+};
+const getPaymentHistoryIntoDB = async (
+  tenantId: string
+) => {
+
+  const payments = await prisma.payment.findMany({
+
+    where: {
+      rentalRequest: {
+        tenantId,
+      },
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+
+    include: {
+
+      rentalRequest: {
+
+        select: {
+
+          id: true,
+
+          status: true,
+
+          property: {
+
+            select: {
+
+              id: true,
+              title: true,
+              city: true,
+              rent: true,
+
+              category: {
+
+                select: {
+                  id: true,
+                  name: true,
+                },
+
+              },
+
+            },
+
+          },
+
+        },
+
+      },
+
+    },
+
+  });
+
+  return payments;
+};
+
+const getPaymentDetailsIntoDB = async (
+  paymentId: string,
+  tenantId: string
+) => {
+  console.log({
+  paymentId,
+  tenantId,
+});
+  const payment = await prisma.payment.findFirstOrThrow({
+
+    where: {
+
+      id: paymentId,
+
+      rentalRequest: {
+        tenantId,
+      },
+
+    },
+
+    include: {
+
+      rentalRequest: {
+
+        include: {
+
+          property: {
+
+            include: {
+
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+
+            },
+
+          },
+
+        },
+
+      },
+
+    },
+
+  });
+
+  return payment;
 };
 
 export const paymentsService = {
     createPaymentSessionIntoDB,
-    handleWebhookSession
+    handleWebhookSession,
+    getPaymentHistoryIntoDB,
+getPaymentDetailsIntoDB
 }

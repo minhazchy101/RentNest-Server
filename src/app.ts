@@ -20,7 +20,6 @@ app.use(cors({
     origin: config.app_url,
     credentials: true
 }))
-const endpointSecret = config.stripe_webhook_secret;
 
 
 app.post(
@@ -28,6 +27,7 @@ app.post(
   express.raw({ type: "application/json" }),
   paymentController.handleWebhook
 );
+
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
