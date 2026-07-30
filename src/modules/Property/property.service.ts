@@ -404,7 +404,7 @@ const updatePropertyIntoDB = async (
 const updatePropertyStatusIntoDB = async (
   propertyId: string,
   landlordId: string,
-   payload: { status: PropertyStatus }
+  payload: { status: PropertyStatus }
 ) => {
 
   const property = await prisma.property.findFirstOrThrow({

@@ -4,6 +4,7 @@ import config from "../../config";
 import { IUserLoginPayload, IUserPayload } from "./auth.interface";
 import { jwtUtils } from "../../utilities/jwt";
 import { SignOptions } from "jsonwebtoken";
+import { Role, UserStatus } from "../../../generated/prisma/enums";
 
 
 const {bcrypt_salt_rounds,
@@ -44,9 +45,6 @@ const userRegisterIntoDB =async (payload : IUserPayload)=> {
         omit : {
             password : true
         },
-        // include:{
-        //     profile : true
-        // }
     })
 
     return user;
@@ -117,6 +115,72 @@ const manageProfileIntoDB = async (
   return user;
 };
 
+const updateUserStatusIntoDB = async (
+  userId: string,
+    payload: { status: UserStatus }
+) => {
+
+  const user = await prisma.user.findUniqueOrThrow({
+
+    where:{
+      id:userId,
+    },
+
+    select:{
+      id:true,
+      role:true,
+      status:true,
+    },
+
+  });
+
+
+  if(user.role === Role.ADMIN){
+    throw new Error(
+      "Admin account cannot be updated."
+    );
+  }
+
+
+  // Only ACTIVE or BANNED allowed
+  if(
+    ![
+      UserStatus.ACTIVE,
+      UserStatus.BANNED,
+    ].includes(payload.status)
+  ){
+    throw new Error(
+      "Status must be ACTIVE or BANNED."
+    );
+  }
+
+
+  const updatedUser =
+    await prisma.user.update({
+
+      where:{
+        id:userId,
+      },
+
+      data:{
+        status:payload.status,
+      },
+
+      select:{
+        id:true,
+        name:true,
+        email:true,
+        role:true,
+        status:true,
+      },
+
+    });
+
+
+  return updatedUser;
+
+};
+
 const getUsersIntoDB = async()=>{
       const result = await prisma.user.findMany({
     orderBy: {
@@ -132,5 +196,6 @@ export const authServices = {
     userLoginIntoDB,
     currentUserIntoDB,
     manageProfileIntoDB,
-    getUsersIntoDB
+    getUsersIntoDB,
+    updateUserStatusIntoDB
 }

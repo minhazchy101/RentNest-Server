@@ -8,7 +8,8 @@ const {userRegisterIntoDB,
       userLoginIntoDB,
      currentUserIntoDB,
      manageProfileIntoDB,
-    getUsersIntoDB
+    getUsersIntoDB,
+    updateUserStatusIntoDB
      } = authServices;
 
 const userRegister = catchAsync(
@@ -90,6 +91,24 @@ const manageProfile = catchAsync (
 });
       });
 
+      const updateUserStatus = catchAsync(
+  async (req: Request, res: Response) => {
+
+    const userId = req.params.id;
+    const payload = req.body;
+
+    const result = await updateUserStatusIntoDB(userId as string, payload);
+
+    sendRes(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "User status updated successfully.",
+      data: result,
+    });
+
+  }
+);
+
 const getUsers = catchAsync(
      async (req: Request, res: Response) => {
 
@@ -109,6 +128,7 @@ export const authControllers = {
     userRegister,
     userLogin,
     currentUser,
+    updateUserStatus,
     manageProfile,
     getUsers
 }
