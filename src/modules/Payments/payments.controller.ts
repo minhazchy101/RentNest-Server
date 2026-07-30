@@ -5,23 +5,42 @@ import { paymentsService } from "./payments.service";
 
 import httpStatus from "http-status-codes"
 
-const { createPaymentSessionIntoDB } = paymentsService;
-const createPaymentSession = catchAsync(
-      async(req: Request, res: Response, next : NextFunction)=>{
-              const tenantID = req.user?.id
+const { createPaymentSessionIntoDB, handleWebhookSession } = paymentsService;
 
-        const result = await createPaymentSessionIntoDB(tenantID as string)
-      sendRes(res, {
-        success : true,
-        statusCode : httpStatus.OK,
-        message: "Check-out complete successfully.",
-        data : result
-    })
+const createPaymentSession = catchAsync(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const tenantId = req.user!.id;
+
+        const { rentalRequestId } = req.body;
+
+        const result = await createPaymentSessionIntoDB(
+            rentalRequestId,
+            tenantId
+        );
+        sendRes(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "Check-out complete successfully.",
+            data: result
+        })
     }
 );
 
+const handleWebhook = catchAsync(
+  async (req: Request, res: Response) => {
+    const payload = req.body as Buffer;
+
+    const signature = req.headers["stripe-signature"] as string;
+
+    await handleWebhookSession(payload, signature);
+
+    res.status(200).json({
+      received: true,
+    });
+  }
+);
 
 export const paymentController = {
     createPaymentSession,
-   
+    handleWebhook,
 }

@@ -8,14 +8,14 @@ model Payment {
 
   amount              Float
 
-  provider            PaymentProvider
+  provider            PaymentProvider  @default(STRIPE)
 
   method              String?
 
   status              PaymentStatus     @default(PENDING)
 
   paidAt              DateTime?
-  stripeCustomerId String @unique
+
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 

@@ -6,6 +6,7 @@ import { Role } from "../../../generated/prisma/enums";
 const router = Router();
 
 const {createPaymentSession,
+    handleWebhook,
 } = paymentController;
 
 router.post('/create', auth(Role.TENANT), createPaymentSession)

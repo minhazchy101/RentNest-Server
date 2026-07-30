@@ -18,7 +18,7 @@ router.patch("/landlord/:id", auth(Role.LANDLORD), updateRentalStatus);
 
 // Tenant
 router.post("/", auth(Role.TENANT), submitRental);
-router.get("/", auth(Role.TENANT), myRentalHistory);
+router.get("/my-requests", auth(Role.TENANT), myRentalHistory);
 router.get("/:id", auth(Role.TENANT), rentalDetails);
 
 

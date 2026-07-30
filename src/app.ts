@@ -7,6 +7,9 @@ import { categoryRoutes } from "./modules/Category/category.routes";
 import { propertyRoutes } from "./modules/Property/property.routes";
 import { rentalRoutes } from "./modules/Rental Requests/rental.routes";
 import { paymentRoutes } from "./modules/Payments/payments.routes";
+import { notFound } from "./middleware/notFound";
+import { globalError } from "./middleware/globalError";
+import { paymentController } from "./modules/Payments/payments.controller";
 
 
 export const app : Application = express();
@@ -17,9 +20,14 @@ app.use(cors({
     origin: config.app_url,
     credentials: true
 }))
+const endpointSecret = config.stripe_webhook_secret;
 
 
-
+app.post(
+  "/api/payments/webhook",
+  express.raw({ type: "application/json" }),
+  paymentController.handleWebhook
+);
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
@@ -36,3 +44,5 @@ app.use("/api/rentals", rentalRoutes);
 app.use("/api/payments", paymentRoutes);
 
 
+app.use(notFound)
+app.use(globalError)
