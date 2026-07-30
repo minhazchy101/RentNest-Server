@@ -1,3 +1,4 @@
+import { Prisma } from "../../../generated/prisma/client";
 import { PaymentProvider, PaymentStatus, PropertyStatus, RentalStatus } from "../../../generated/prisma/enums";
 import config from "../../config";
 import { prisma } from "../../lib/prisma"
@@ -159,7 +160,7 @@ const handleWebhookSession = async (
     return;
   }
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx : Prisma.TransactionClient) => {
     // Create Payment
     await tx.payment.create({
   data: {

@@ -1,3 +1,4 @@
+import { Prisma } from "../../../generated/prisma/client";
 import { PropertyStatus, RentalStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { IRentalRequest, IUpdateRentalStatus } from "./rental.interface"
@@ -221,7 +222,7 @@ const updateRentalStatusIntoDB = async (
 
 
 
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx : Prisma.TransactionClient) => {
 
 
     // APPROVE FLOW

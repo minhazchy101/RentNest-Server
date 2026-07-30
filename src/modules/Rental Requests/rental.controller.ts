@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../../utilities/catchAsync";
 import { sendRes } from "../../utilities/sendResponse";
 import httpStatus from "http-status-codes"
-import { rentalService } from "./Rental.service";
+import { rentalService } from "./rental.service";
 
 
 const {submitRentalIntoDB,

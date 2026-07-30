@@ -25,7 +25,7 @@ router.patch("/:id/status/landlord",auth(Role.LANDLORD),updatePropertyStatus);
 router.get("/", getProperties)
 router.get("/:id", getPropertyDetails)
 
-// router.patch("/:id/status",)
+
 
 
 export const propertyRoutes = router;
