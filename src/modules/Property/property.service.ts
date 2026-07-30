@@ -401,6 +401,53 @@ const updatePropertyIntoDB = async (
 
 };
 
+const updatePropertyStatusIntoDB = async (
+  propertyId: string,
+  landlordId: string,
+   payload: { status: PropertyStatus }
+) => {
+
+  const property = await prisma.property.findFirstOrThrow({
+
+    where: {
+      id: propertyId,
+      landlordId,
+    },
+
+    select: {
+      id: true,
+      status: true,
+    },
+
+  });
+
+  if (
+    ![
+      PropertyStatus.AVAILABLE,
+      PropertyStatus.RENTED,
+      PropertyStatus.UNAVAILABLE,
+    ].includes(payload.status)
+  ) {
+    throw new Error(
+       "Invalid property status."
+    );
+  }
+
+
+  const result = await prisma.property.update({
+
+    where: {
+      id: propertyId,
+    },
+
+    data: {
+      status: payload.status,
+    },
+
+  });
+
+  return result;
+};
 
 const deletePropertyIntoDB = async(
   id:string,
@@ -447,5 +494,6 @@ export const propertyService = {
   getMyPropertiesIntoDB,
   getPropertyDetailsIntoDB,
   updatePropertyIntoDB,
+  updatePropertyStatusIntoDB,
   deletePropertyIntoDB
 };

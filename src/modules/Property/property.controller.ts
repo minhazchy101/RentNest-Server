@@ -9,7 +9,8 @@ const {createPropertyIntoDB,
   getMyPropertiesIntoDB,
    getPropertyDetailsIntoDB,
   updatePropertyIntoDB,
-  deletePropertyIntoDB
+  updatePropertyStatusIntoDB,
+  deletePropertyIntoDB,
   
 } = propertyService;
 
@@ -104,6 +105,27 @@ const updateProperty = catchAsync(
   }
 );
 
+const updatePropertyStatus = catchAsync(
+  async (req: Request, res: Response) => {
+
+    const propertyId = req.params.id;
+    const landlordId = req.user!.id;
+
+    const result = await updatePropertyStatusIntoDB(
+      propertyId as string,
+      landlordId,
+      req.body
+    );
+
+    sendRes(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Property status updated successfully.",
+      data: result,
+    });
+  }
+);
+
 const deleteProperty = catchAsync(
   async(req:Request,res:Response)=>{
 
@@ -128,7 +150,7 @@ const deleteProperty = catchAsync(
     });
 
   }
-)
+);
 
 
 export const propertyController ={
@@ -137,5 +159,6 @@ export const propertyController ={
     getPropertyDetails,
     updateProperty,
 deleteProperty,
-getMyProperties
+getMyProperties,
+updatePropertyStatus
 }
